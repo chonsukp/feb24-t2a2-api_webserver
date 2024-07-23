@@ -2,6 +2,7 @@ from flask import Blueprint
 
 from init import db, bcrypt
 from models.user import User
+from models.domain import Domain
 
 db_commands = Blueprint("db", __name__)
 
@@ -17,6 +18,7 @@ def drop_tables():
     db.drop_all()
     print("Tables dropped")
 
+# seed tables
 @db_commands.cli.command("seed")
 def seed_tables():
     users = [
@@ -64,6 +66,27 @@ def seed_tables():
     ]
 
     db.session.add_all(users)
+    db.session.commit()
+
+    domains = [
+        Domain(
+            domain_name="domain1.com.au",
+            registered_period=1,
+            user_id=users[1].id
+        ),
+        Domain(
+            domain_name="domain2.com.au",
+            registered_period=2,
+            user_id=users[2].id
+        ),
+        Domain(
+            domain_name="domain3.com.au",
+            registered_period=3,
+            user_id=users[3].id
+        )
+    ]
+
+    db.session.add_all(domains)
     db.session.commit()
 
     print("Tables seeded")
