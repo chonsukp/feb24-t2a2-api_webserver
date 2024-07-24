@@ -26,15 +26,15 @@ class Domain(db.Model):
         self.expiry_date = self.registered_date + timedelta(days=registered_period * 365)
         self.user_id = user_id
 
-    class DomainSchema(ma.Schema):
+class DomainSchema(ma.Schema):
 
-        user = fields.Nested('UserSchema', only=["id", "name", "email"])
+    user = fields.Nested('UserSchema', only=["id", "name", "email"])
 
-        class Meta:
-            fields = ("id", "domain_name", "registered_period", "registered_date", "expiry_date", "user_id")
+    class Meta:
+        fields = ("id", "domain_name", "registered_period", "registered_date", "expiry_date", "user")
 
-    domain_schema = DomainSchema()
-    domains_schema = DomainSchema(many=True)
+domain_schema = DomainSchema()
+domains_schema = DomainSchema(many=True)
 
   
     

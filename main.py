@@ -23,5 +23,8 @@ def create_app():
     from controllers.auth_controller import auth_bp
     app.register_blueprint(auth_bp)
 
+    from controllers.domain_controller import domains_bp
+    app.register_blueprint(domains_bp)
+
     return app
 
