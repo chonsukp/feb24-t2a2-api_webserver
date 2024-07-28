@@ -5,7 +5,7 @@ class Service(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     service_name = db.Column(db.String, nullable=False, unique=True)
-    description = db.Column(db.String)
+    description = db.Column(db.String, nullable=False)
     service_price = db.Column(db.Float, nullable=False)
 
 class ServiceSchema(ma.Schema):
