@@ -16,6 +16,7 @@ class Domain(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     user = db.relationship('User', back_populates='domains')
+    domain_services = db.relationship('Domain_Service', back_populates='domain')
 
     def __init__(self, domain_name, registered_period, user_id):
         if not (1 <= registered_period <= 9):
@@ -45,10 +46,11 @@ class Domain(db.Model):
 class DomainSchema(ma.Schema):
 
     user = fields.Nested('UserSchema', only=["id", "name", "email"])
+    domain_services = fields.Nested('Domain_ServiceSchema', many=True, only=["total_price"])
 
     class Meta:
-        fields = ("id", "domain_name", "registered_period", "registered_date", "expiry_date", "domain_price", "user")
+        fields = ("id", "domain_name", "registered_period", "registered_date", "expiry_date", "domain_price", "user", "domain_services")
+        ordered = True
 
 domain_schema = DomainSchema()
 domains_schema = DomainSchema(many=True)
-
