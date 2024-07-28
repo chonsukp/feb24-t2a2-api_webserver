@@ -4,6 +4,7 @@ from init import db, bcrypt
 from models.user import User
 from models.domain import Domain
 from models.service import Service
+from models.domain_service import Domain_Service
 
 db_commands = Blueprint("db", __name__)
 
@@ -101,4 +102,29 @@ def seed_tables():
     db.session.add_all(services)
     db.session.commit()
 
+    domain_services = [
+        Domain_Service(
+            domain_id=domains[0].id, 
+            service_id=services[0].id, 
+            domain_price=domains[0].domain_price, 
+            service_price=services[0].service_price
+        ),
+        Domain_Service(
+            domain_id=domains[1].id, 
+            service_id=services[1].id, 
+            domain_price=domains[1].domain_price, 
+            service_price=services[1].service_price
+        ),
+        Domain_Service(
+            domain_id=domains[2].id, 
+            service_id=services[2].id, 
+            domain_price=domains[2].domain_price, 
+            service_price=services[2].service_price
+            )
+    ]
+
+    db.session.add_all(domain_services)
+    db.session.commit()
+
     print("Tables seeded")
+

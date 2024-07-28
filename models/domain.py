@@ -51,3 +51,4 @@ class DomainSchema(ma.Schema):
 
 domain_schema = DomainSchema()
 domains_schema = DomainSchema(many=True)
+

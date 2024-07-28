@@ -28,4 +28,9 @@ def create_app():
     from controllers.service_controller import services_bp
     app.register_blueprint(services_bp)
 
+    from controllers.domain_service_controller import domain_services_bp
+    app.register_blueprint(domain_services_bp)
+
     return app
+
+
