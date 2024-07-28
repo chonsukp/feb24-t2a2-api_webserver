@@ -11,30 +11,23 @@ from models.user import User, user_schema
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
-# REGISTER USER
-
+# register user
 @auth_bp.route("/register", methods=["POST"])
 def register_user():
     try:
-        # payload of the request 
         body_data = request.get_json()
-        # create an instance of the User model 
         user = User(
             name=body_data.get("name"),
             email=body_data.get("email")
         )
-        # extract password from the body
-        password = body_data.get("password")
 
-        # hash password
+        password = body_data.get("password")
         if password:
             user.password = bcrypt.generate_password_hash(password).decode("utf-8")
 
-        # add and commit to the database
         db.session.add(user)
         db.session.commit()
 
-        # respond back
         return user_schema.dump(user), 201
     
     except IntegrityError as err:
@@ -43,20 +36,14 @@ def register_user():
         if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
             return {"error": "Email address is already in use"}, 409
 
-# LOG IN USER 
-
+# log in user
 @auth_bp.route("/login", methods=["POST"])
 def login_user():
-    # get data from the body of the request 
     body_data = request.get_json()
-    # find the user in db with that email address
     stmt = db.select(User).filter_by(email=body_data.get("email"))
     user = db.session.scalar(stmt)
-    # if user exists and password is correct 
     if user and bcrypt.check_password_hash(user.password, body_data.get("password")):
-        #  create jwt
         token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=1))
-        # respond back
         return {"email": user.email, "is_admin": user.is_admin, "token": token}
     else:
         return {"error": "Invalid email or password"}, 401

@@ -1,4 +1,3 @@
-
 from datetime import timedelta
 
 from flask import Blueprint, request
@@ -9,14 +8,12 @@ from models.domain import Domain, domain_schema, domains_schema
 
 domains_bp = Blueprint("domains", __name__, url_prefix="/domains")
 
-# /cards - GET - fetch all domains
 @domains_bp.route("/")
 def get_all_domains():
     stmt = db.select(Domain)
     domains = db.session.scalars(stmt)  
     return domains_schema.dump(domains)
 
-# /cards/<id> - GET - fetch a single domain 
 @domains_bp.route("/<int:domain_id>")
 def get_one_domain(domain_id):
     stmt = db.select(Domain).filter_by(id=domain_id)
@@ -26,7 +23,6 @@ def get_one_domain(domain_id):
     else:
         return {"error": f"Domain with id {domain_id} not found"}, 404
     
-# /cards - POST - register a new domain
 @domains_bp.route("/", methods=["POST"])
 @jwt_required()
 def register_domain():
@@ -40,7 +36,6 @@ def register_domain():
     db.session.commit()
     return domain_schema.dump(domain)
 
-# /cards/<id> - DELETE - unregister a domain
 @domains_bp.route("/<int:domain_id>", methods=["DELETE"])
 @jwt_required()
 def unregister_domain(domain_id):
@@ -49,11 +44,10 @@ def unregister_domain(domain_id):
     if domain:
         db.session.delete(domain)
         db.session.commit()
-        return {"error": f"Domain id '{domain_id}' unregistered successfully"}
+        return {"message": f"Domain id '{domain_id}' unregistered successfully"}
     else:
         return {"error": f"Domain with id '{domain_id}' not found"}, 404
 
-# /cards/<id> - PUT, PATCH - edit domain_name, registered_period
 @domains_bp.route("/<int:domain_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 def update_domain(domain_id):
@@ -68,6 +62,5 @@ def update_domain(domain_id):
         db.session.commit()
         return domain_schema.dump(domain)
     else:
-        return {"error": f"Domain with id '{domain_id} not found"}, 404
-
+        return {"error": f"Domain with id '{domain_id}' not found"}, 404
 

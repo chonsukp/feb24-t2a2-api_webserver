@@ -4,7 +4,6 @@ from flask import Flask
 
 from init import db, ma, bcrypt, jwt
 
-# application factories
 def create_app():
     app = Flask(__name__)
 
@@ -26,5 +25,7 @@ def create_app():
     from controllers.domain_controller import domains_bp
     app.register_blueprint(domains_bp)
 
-    return app
+    from controllers.service_controller import services_bp
+    app.register_blueprint(services_bp)
 
+    return app

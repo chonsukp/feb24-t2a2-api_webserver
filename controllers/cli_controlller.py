@@ -3,6 +3,7 @@ from flask import Blueprint
 from init import db, bcrypt
 from models.user import User
 from models.domain import Domain
+from models.service import Service
 
 db_commands = Blueprint("db", __name__)
 
@@ -42,27 +43,7 @@ def seed_tables():
             name="User 3",
             email="user3@email.com",
             password=bcrypt.generate_password_hash("user3@123").decode("utf-8"),
-        ),
-        User(
-            name="User 4",
-            email="user4@email.com",
-            password=bcrypt.generate_password_hash("user4@123").decode("utf-8"),
-        ),
-        User(
-            name="User 5",
-            email="user5@email.com",
-            password=bcrypt.generate_password_hash("user5@123").decode("utf-8"),
-        ),
-        User(
-            name="User 6",
-            email="user6@email.com",
-            password=bcrypt.generate_password_hash("user6@123").decode("utf-8"),
-        ),
-        User(
-            name="User 7",
-            email="user7@email.com",
-            password=bcrypt.generate_password_hash("user7@123").decode("utf-8"),
-        ),
+        )
     ]
 
     db.session.add_all(users)
@@ -87,6 +68,37 @@ def seed_tables():
     ]
 
     db.session.add_all(domains)
+    db.session.commit()
+
+    services = [
+        Service(
+            service_name="Domain Manager", 
+            description="Manage DNS records", 
+            service_price=22.95
+        ),
+        Service(
+            service_name="SSL Certification", 
+            description="Encrypt website data", 
+            service_price=75.95
+        ),
+        Service(
+            service_name="Domain Privacy", 
+            description="Hide WHOIS info", 
+            service_price=15.95
+        ),
+        Service(
+            service_name="Domain Redirection", 
+            description="Redirect to another URL", 
+            service_price=19.95
+        ),
+        Service(
+            service_name="Email Forwarding", 
+            description="Forward emails to another account", 
+            service_price=30.95
+        )
+    ]
+
+    db.session.add_all(services)
     db.session.commit()
 
     print("Tables seeded")
