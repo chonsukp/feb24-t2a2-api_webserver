@@ -96,6 +96,16 @@ def seed_tables():
             service_name="Email Forwarding", 
             description="Forward emails to another account", 
             service_price=30.95
+        ),
+        Service(
+            service_name="Web Hosting", 
+            description="Host websites", 
+            service_price=120.95
+        ),
+        Service(
+            service_name="Email Hosting", 
+            description="Host email accounts", 
+            service_price=50.95
         )
     ]
 

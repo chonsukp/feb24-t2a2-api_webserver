@@ -5,8 +5,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from init import db
 from models.domain import Domain, domain_schema, domains_schema
-from models.domain_service import Domain_Service, domain_service_schema, domain_services_schema
 from models.service import Service, services_schema
+from models.domain_service import Domain_Service, domain_service_schema, domain_services_schema
 
 domains_bp = Blueprint("domains", __name__, url_prefix="/domains")
 
@@ -79,7 +79,12 @@ def add_service_to_domain(domain_id):
     service = db.session.scalar(service_stmt)
 
     if domain and service:
-        domain_service = Domain_Service(domain_id=domain.id, service_id=service.id, domain_price=domain.domain_price, service_price=service.service_price)
+        domain_service = Domain_Service(
+            domain_id=domain.id, 
+            service_id=service.id, 
+            domain_price=domain.domain_price, 
+            service_price=service.service_price
+            )
         db.session.add(domain_service)
         db.session.commit()
         return domain_service_schema.dump(domain_service)
