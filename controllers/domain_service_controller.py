@@ -49,17 +49,6 @@ def create_domain_service(domain_id):
     else:
         return {"error": "Invalid domain or service ID"}, 404
 
-from flask import Blueprint, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy.exc import IntegrityError
-from psycopg2 import errorcodes
-
-from init import db
-from models.user import User
-from models.domain import Domain
-from models.service import Service
-from models.domain_service import Domain_Service, domain_service_schema, domain_services_schema
-
 # DELETE a domain service - Admin only
 @domain_services_bp.route("/<int:domain_service_id>", methods=["DELETE"])
 @jwt_required()
