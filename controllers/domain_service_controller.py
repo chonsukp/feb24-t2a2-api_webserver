@@ -1,7 +1,5 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy.exc import IntegrityError
-from psycopg2 import errorcodes
 
 from init import db
 from models.user import User
@@ -19,7 +17,7 @@ def create_domain_service(domain_id):
     user = db.session.get(User, user_id)
 
     if not user.is_admin:
-        return {"error": "Admin access required"}, 403
+        return {"error": "You do not have permission to perform this operation"}, 403
 
     body_data = request.get_json()
     service_id = body_data.get("service_id")
@@ -31,21 +29,15 @@ def create_domain_service(domain_id):
     service = db.session.scalar(service_stmt)
 
     if domain and service:
-        try:
-            domain_service = Domain_Service(
-                domain_id=domain.id,
-                service_id=service.id,
-                domain_price=domain.domain_price,
-                service_price=service.service_price
-            )
-            db.session.add(domain_service)
-            db.session.commit()
-            return domain_service_schema.dump(domain_service), 201
-        except IntegrityError as err:
-            if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
-                return {"error": "This domain service combination already exists"}, 409
-            else:
-                return {"error": "An unexpected error occurred"}, 500
+        domain_service = Domain_Service(
+            domain_id=domain.id,
+            service_id=service.id,
+            domain_price=domain.domain_price,
+            service_price=service.service_price
+        )
+        db.session.add(domain_service)
+        db.session.commit()
+        return domain_service_schema.dump(domain_service), 201
     else:
         return {"error": "Invalid domain or service ID"}, 404
 
@@ -57,7 +49,7 @@ def delete_domain_service(domain_id, domain_service_id):
     user = db.session.get(User, user_id)
 
     if not user.is_admin:
-        return {"error": "Admin access required"}, 403
+        return {"error": "You do not have permission to perform this operation"}, 403
 
     stmt = db.select(Domain_Service).filter_by(id=domain_service_id, domain_id=domain_id)
     domain_service = db.session.scalar(stmt)
@@ -67,4 +59,3 @@ def delete_domain_service(domain_id, domain_service_id):
         return {"message": f"Domain service id '{domain_service_id}' deleted successfully"}
     else:
         return {"error": f"Domain service with id '{domain_service_id}' not found"}, 404
-

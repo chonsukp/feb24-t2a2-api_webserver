@@ -33,6 +33,9 @@ def create_app():
     from controllers.domain_service_controller import domain_services_bp
     app.register_blueprint(domain_services_bp)
 
+    from errors.errors import errors_bp
+    app.register_blueprint(errors_bp)
+
     return app
 
 

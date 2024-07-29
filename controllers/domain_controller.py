@@ -2,8 +2,6 @@ from datetime import timedelta
 
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from sqlalchemy.exc import IntegrityError
-from psycopg2 import errorcodes
 
 from init import db
 from models.user import User
@@ -42,15 +40,9 @@ def register_domain():
         registered_period=body_data.get("registered_period"),
         user_id=get_jwt_identity()
     )
-    try:
-        db.session.add(domain)
-        db.session.commit()
-        return domain_schema.dump(domain), 201
-    except IntegrityError as err:
-        db.session.rollback()
-        if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
-            return {"error": "Domain name already exists"}, 409
-        return {"error": "An unexpected error occurred"}, 500
+    db.session.add(domain)
+    db.session.commit()
+    return domain_schema.dump(domain), 201
 
 # DELETE - domain owner or admin only
 @domains_bp.route("/<int:domain_id>", methods=["DELETE"])
@@ -65,13 +57,9 @@ def unregister_domain(domain_id):
         if domain.user_id != user_id and not user.is_admin:
             return {"error": "You do not have permission to unregister this domain"}, 403
 
-        try:
-            db.session.delete(domain)
-            db.session.commit()
-            return {"message": f"Domain id '{domain_id}' unregistered successfully"}
-        except IntegrityError:
-            db.session.rollback()
-            return {"error": "An unexpected error occurred during deletion"}, 500
+        db.session.delete(domain)
+        db.session.commit()
+        return {"message": f"Domain id '{domain_id}' unregistered successfully"}
     else:
         return {"error": f"Domain with id '{domain_id}' not found"}, 404
 
@@ -93,13 +81,7 @@ def update_domain(domain_id):
         domain.registered_period = body_data.get("registered_period") or domain.registered_period
         domain.expiry_date = domain.registered_date + timedelta(days=domain.registered_period * 365)
 
-        try:
-            db.session.commit()
-            return domain_schema.dump(domain)
-        except IntegrityError as err:
-            db.session.rollback()
-            if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
-                return {"error": "Domain name already exists"}, 409
-            return {"error": "An unexpected error occurred"}, 500
+        db.session.commit()
+        return domain_schema.dump(domain)
     else:
         return {"error": f"Domain with id '{domain_id}' not found"}, 404
