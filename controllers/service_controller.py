@@ -1,7 +1,8 @@
 from flask import Blueprint, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from init import db
+from models.user import User
 from models.service import Service, service_schema, services_schema
 
 services_bp = Blueprint("services", __name__, url_prefix="/services")
@@ -21,12 +22,18 @@ def get_one_service(service_id):
     if service:
         return service_schema.dump(service)
     else:
-        return {"error": f"Service with id {service_id} not found"}, 404
+        return {"error": f"Service with id '{service_id}' not found"}, 404
 
-# POST create a new service
+# POST create a new service - Admin only
 @services_bp.route("/", methods=["POST"])
 @jwt_required()
 def create_service():
+    user_id = get_jwt_identity()
+    user = db.session.get(User, user_id)
+
+    if not user.is_admin:
+        return {"error": "Admin access required"}, 403
+
     body_data = request.get_json()
     service = Service(
         service_name=body_data.get("service_name"),
@@ -37,23 +44,16 @@ def create_service():
     db.session.commit()
     return service_schema.dump(service), 201
 
-# DELETE a service by ID
-@services_bp.route("/<int:service_id>", methods=["DELETE"])
-@jwt_required()
-def delete_service(service_id):
-    stmt = db.select(Service).filter_by(id=service_id)
-    service = db.session.scalar(stmt)
-    if service:
-        db.session.delete(service)
-        db.session.commit()
-        return {"message": f"Service id '{service_id}' deleted successfully"}
-    else:
-        return {"error": f"Service with id '{service_id}' not found"}, 404
-
-# PUT/PATCH update a service by ID
+# PUT/PATCH update a service by ID - Admin only
 @services_bp.route("/<int:service_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 def update_service(service_id):
+    user_id = get_jwt_identity()
+    user = db.session.get(User, user_id)
+
+    if not user.is_admin:
+        return {"error": "Admin access required"}, 403
+
     body_data = request.get_json()
     stmt = db.select(Service).filter_by(id=service_id)
     service = db.session.scalar(stmt)
@@ -64,5 +64,24 @@ def update_service(service_id):
 
         db.session.commit()
         return service_schema.dump(service)
+    else:
+        return {"error": f"Service with id '{service_id}' not found"}, 404
+    
+# DELETE a service by ID - Admin only
+@services_bp.route("/<int:service_id>", methods=["DELETE"])
+@jwt_required()
+def delete_service(service_id):
+    user_id = get_jwt_identity()
+    user = db.session.get(User, user_id)
+
+    if not user.is_admin:
+        return {"error": "Admin access required"}, 403
+
+    stmt = db.select(Service).filter_by(id=service_id)
+    service = db.session.scalar(stmt)
+    if service:
+        db.session.delete(service)
+        db.session.commit()
+        return {"message": f"Service id '{service_id}' deleted successfully"}
     else:
         return {"error": f"Service with id '{service_id}' not found"}, 404
