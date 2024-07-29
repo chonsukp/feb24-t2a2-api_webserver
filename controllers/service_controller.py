@@ -1,5 +1,7 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy.exc import IntegrityError
+from psycopg2 import errorcodes
 
 from init import db
 from models.user import User
@@ -40,9 +42,15 @@ def create_service():
         description=body_data.get("description"),
         service_price=body_data.get("service_price")
     )
-    db.session.add(service)
-    db.session.commit()
-    return service_schema.dump(service), 201
+    try:
+        db.session.add(service)
+        db.session.commit()
+        return service_schema.dump(service), 201
+    except IntegrityError as err:
+        db.session.rollback()
+        if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
+            return {"error": "Service name already exists"}, 409
+        return {"error": "An unexpected error occurred"}, 500
 
 # PUT/PATCH update a service by ID - Admin only
 @services_bp.route("/<int:service_id>", methods=["PUT", "PATCH"])
@@ -62,11 +70,17 @@ def update_service(service_id):
         service.description = body_data.get("description") or service.description
         service.service_price = body_data.get("service_price") or service.service_price
 
-        db.session.commit()
-        return service_schema.dump(service)
+        try:
+            db.session.commit()
+            return service_schema.dump(service)
+        except IntegrityError as err:
+            db.session.rollback()
+            if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
+                return {"error": "Service name already exists"}, 409
+            return {"error": "An unexpected error occurred"}, 500
     else:
         return {"error": f"Service with id '{service_id}' not found"}, 404
-    
+
 # DELETE a service by ID - Admin only
 @services_bp.route("/<int:service_id>", methods=["DELETE"])
 @jwt_required()
@@ -80,8 +94,12 @@ def delete_service(service_id):
     stmt = db.select(Service).filter_by(id=service_id)
     service = db.session.scalar(stmt)
     if service:
-        db.session.delete(service)
-        db.session.commit()
-        return {"message": f"Service id '{service_id}' deleted successfully"}
+        try:
+            db.session.delete(service)
+            db.session.commit()
+            return {"message": f"Service id '{service_id}' deleted successfully"}
+        except IntegrityError:
+            db.session.rollback()
+            return {"error": "An unexpected error occurred during deletion"}, 500
     else:
         return {"error": f"Service with id '{service_id}' not found"}, 404
