@@ -16,7 +16,7 @@ class Domain(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     user = db.relationship('User', back_populates='domains')
-    domain_services = db.relationship('Domain_Service', back_populates='domain')
+    domain_services = db.relationship('Domain_Service', back_populates='domain', cascade="all, delete")
 
     def __init__(self, domain_name, registered_period, user_id):
         if not (1 <= registered_period <= 9):
