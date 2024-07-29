@@ -7,8 +7,10 @@ from init import db
 from models.domain import Domain, domain_schema, domains_schema
 from models.service import Service, services_schema
 from models.domain_service import Domain_Service, domain_service_schema, domain_services_schema
+from controllers.domain_service_controller import domain_services_bp
 
 domains_bp = Blueprint("domains", __name__, url_prefix="/domains")
+domains_bp.register_blueprint(domain_services_bp)
 
 @domains_bp.route("/")
 def get_all_domains():

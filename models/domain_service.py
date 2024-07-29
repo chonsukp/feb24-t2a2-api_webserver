@@ -10,6 +10,8 @@ class Domain_Service(db.Model):
     domain_id = db.Column(db.Integer, db.ForeignKey("domains.id"), nullable=False)
     service_id = db.Column(db.Integer, db.ForeignKey("services.id"), nullable=False)
 
+    __table_args__ = (db.UniqueConstraint('domain_id', 'service_id', name='_domain_service_uc'),)
+
     domain = db.relationship("Domain", back_populates="domain_services")
     service = db.relationship("Service", back_populates="domain_services")
 

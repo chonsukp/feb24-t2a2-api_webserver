@@ -46,7 +46,7 @@ class Domain(db.Model):
 class DomainSchema(ma.Schema):
 
     user = fields.Nested('UserSchema', only=["id", "name", "email"])
-    domain_services = fields.Nested('Domain_ServiceSchema', many=True, only=["total_price"])
+    domain_services = fields.Nested('Domain_ServiceSchema', many=True, only=["id", "total_price"])
 
     class Meta:
         fields = ("id", "domain_name", "registered_period", "registered_date", "expiry_date", "domain_price", "user", "domain_services")
