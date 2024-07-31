@@ -14,7 +14,7 @@ class User(db.Model):
     created_date = db.Column(db.Date, default=datetime.now, nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
     
-    domains = db.relationship('Domain', back_populates='user')
+    domains = db.relationship('Domain', back_populates='user', cascade="all, delete")
 
 class UserSchema(ma.Schema):
     domains = fields.List(fields.Nested('DomainSchema', exclude=["user"]))

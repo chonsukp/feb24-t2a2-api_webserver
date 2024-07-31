@@ -9,7 +9,7 @@ class Service(db.Model):
     description = db.Column(db.String, nullable=False)
     service_price = db.Column(db.Float, nullable=False)
 
-    domain_services = db.relationship('Domain_Service', back_populates='service')
+    domain_services = db.relationship('Domain_Service', back_populates='service', cascade="all, delete")
 
 class ServiceSchema(ma.Schema):
 

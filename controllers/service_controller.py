@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from init import db
 from models.user import User
 from models.service import Service, service_schema, services_schema
+from utils import auth_as_admin_decorator
 
 services_bp = Blueprint("services", __name__, url_prefix="/services")
 
@@ -14,7 +15,7 @@ def get_all_services():
     services = db.session.scalars(stmt)
     return services_schema.dump(services)
 
-# GET a single service by ID
+# GET one service
 @services_bp.route("/<int:service_id>", methods=["GET"])
 def get_one_service(service_id):
     stmt = db.select(Service).filter_by(id=service_id)
@@ -24,17 +25,18 @@ def get_one_service(service_id):
     else:
         return {"error": f"Service with id '{service_id}' not found"}, 404
 
-# POST create a new service - Admin only
+# CRETE a new service (Admin)
 @services_bp.route("/", methods=["POST"])
 @jwt_required()
+@auth_as_admin_decorator
 def create_service():
-    user_id = get_jwt_identity()
-    user = db.session.get(User, user_id)
-
-    if not user.is_admin:
-        return {"error": "You do not have permission to perform this operation"}, 403
-
     body_data = request.get_json()
+    if 'service_name' not in body_data:
+        return {"error": "Service name field is required"}, 400
+    if 'description' not in body_data:
+        return {"error": "Description field is required"}, 400
+    if 'service_price' not in body_data:
+        return {"error": "Service price field is required"}, 400
     service = Service(
         service_name=body_data.get("service_name"),
         description=body_data.get("description"),
@@ -44,16 +46,11 @@ def create_service():
     db.session.commit()
     return service_schema.dump(service), 201
 
-# PUT/PATCH update a service by ID - Admin only
+# UPDATE service (Admin Only)
 @services_bp.route("/<int:service_id>", methods=["PUT", "PATCH"])
 @jwt_required()
+@auth_as_admin_decorator
 def update_service(service_id):
-    user_id = get_jwt_identity()
-    user = db.session.get(User, user_id)
-
-    if not user.is_admin:
-        return {"error": "You do not have permission to perform this operation"}, 403
-
     body_data = request.get_json()
     stmt = db.select(Service).filter_by(id=service_id)
     service = db.session.scalar(stmt)
@@ -67,16 +64,11 @@ def update_service(service_id):
     else:
         return {"error": f"Service with id '{service_id}' not found"}, 404
 
-# DELETE a service by ID - Admin only
+# DELETE service (Admin Only)
 @services_bp.route("/<int:service_id>", methods=["DELETE"])
 @jwt_required()
+@auth_as_admin_decorator
 def delete_service(service_id):
-    user_id = get_jwt_identity()
-    user = db.session.get(User, user_id)
-
-    if not user.is_admin:
-        return {"error": "You do not have permission to perform this operation"}, 403
-
     stmt = db.select(Service).filter_by(id=service_id)
     service = db.session.scalar(stmt)
     if service:
@@ -85,3 +77,5 @@ def delete_service(service_id):
         return {"message": f"Service id '{service_id}' deleted successfully"}
     else:
         return {"error": f"Service with id '{service_id}' not found"}, 404
+    
+

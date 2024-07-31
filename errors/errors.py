@@ -6,7 +6,7 @@ from marshmallow.exceptions import ValidationError
 errors_bp = Blueprint('errors', __name__)
 
 @errors_bp.app_errorhandler(IntegrityError)
-def handle_integrity_error(error):
+def integrity_error(error):
     if error.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
         return ({"error": "This value already exists. Please use a unique value."}), 409
     if error.orig.pgcode == errorcodes.NOT_NULL_VIOLATION:

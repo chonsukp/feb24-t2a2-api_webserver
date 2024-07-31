@@ -8,19 +8,19 @@ from models.domain_service import Domain_Service
 
 db_commands = Blueprint("db", __name__)
 
-# create tables
+# CREATE tables
 @db_commands.cli.command("create")
 def create_tables():
     db.create_all()
     print("Tables created")
 
-# drop tables
+# DROP tables
 @db_commands.cli.command("drop")
 def drop_tables():
     db.drop_all()
     print("Tables dropped")
 
-# seed tables
+# SEED tables
 @db_commands.cli.command("seed")
 def seed_tables():
     users = [
