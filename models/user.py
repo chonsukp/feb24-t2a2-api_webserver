@@ -1,5 +1,6 @@
 from datetime import datetime
 from marshmallow import fields
+from marshmallow.validate import Regexp
 
 from init import db, ma
 
@@ -17,6 +18,10 @@ class User(db.Model):
 
 class UserSchema(ma.Schema):
     domains = fields.List(fields.Nested('DomainSchema', exclude=["user"]))
+
+    email = fields.String(required=True, validate=Regexp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', error="Invalid email format"))
+    password = fields.String(required=True, validate=Regexp("^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$", error="Password must be minimum eight characters, at least one letter, one number and one special character"))
+
     class Meta: 
         fields = ("id", "name", "email", "password", "created_date", "is_admin", "domains")
 

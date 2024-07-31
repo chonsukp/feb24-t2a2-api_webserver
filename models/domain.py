@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from marshmallow import fields
+from marshmallow.validate import Regexp
 
 from init import db, ma 
 
@@ -46,7 +47,9 @@ class Domain(db.Model):
 class DomainSchema(ma.Schema):
 
     user = fields.Nested('UserSchema', only=["id", "name", "email"])
-    domain_services = fields.Nested('Domain_ServiceSchema', many=True, only=["id", "total_price"])
+    domain_services = fields.Nested('Domain_ServiceSchema', many=True, only=["id"])
+
+    domain_name = fields.String(required=True, validate=Regexp('^(?!www\.)[a-zA-Z0-9-]+\.[a-zA-Z]{2,63}(\.[a-zA-Z]{2,63})?$', error="Please enter a valid domain name"))
 
     class Meta:
         fields = ("id", "domain_name", "registered_period", "registered_date", "expiry_date", "domain_price", "user", "domain_services")

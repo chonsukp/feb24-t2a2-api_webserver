@@ -16,7 +16,7 @@ class ServiceSchema(ma.Schema):
     domain_services = fields.Nested('Domain_ServiceSchema', many=True, only=["id", "total_price"])
 
     class Meta:
-        fields = ("id", "service_name", "description", "service_price", "domain_services")
+        fields = ("id", "service_name", "description", "service_price", "domain_services", "domain")
         ordered = True
 
 service_schema = ServiceSchema()
