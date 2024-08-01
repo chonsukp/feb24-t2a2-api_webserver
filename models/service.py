@@ -15,13 +15,13 @@ class Service(db.Model):
     # Relationship to the Domain_Service model
     domain_services = db.relationship('Domain_Service', back_populates='service', cascade="all, delete")
 
-# Define the schema for serializing and deserializing Service objects
+# Define the schema for serialising and deserialising Service objects
 class ServiceSchema(ma.Schema):
     # Nested relationship to Domain_ServiceSchema
     domain_services = fields.Nested('Domain_ServiceSchema', many=True, only=["id", "total_price"])
 
     class Meta:
-         # Fields to include in the serialized output
+         # Fields to include in the serialised output
         fields = ("id", "service_name", "description", "service_price", "domain_services", "domain")
         ordered = True
 

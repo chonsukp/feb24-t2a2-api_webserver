@@ -6,23 +6,25 @@ from models.domain import Domain
 from models.service import Service
 from models.domain_service import Domain_Service
 
+# Create a Blueprint for database commands
 db_commands = Blueprint("db", __name__)
 
-# CREATE tables
+# CREATE all tables
 @db_commands.cli.command("create")
 def create_tables():
     db.create_all()
     print("Tables created")
 
-# DROP tables
+# DROP all tables
 @db_commands.cli.command("drop")
 def drop_tables():
     db.drop_all()
     print("Tables dropped")
 
-# SEED tables
+# SEED all tables
 @db_commands.cli.command("seed")
 def seed_tables():
+    # Create users
     users = [
         User(
             name="Admin 1",
@@ -46,10 +48,11 @@ def seed_tables():
             password=bcrypt.generate_password_hash("user3@123").decode("utf-8"),
         )
     ]
-
+    # Add all users to the session and commit
     db.session.add_all(users)
     db.session.commit()
 
+    # Create domains
     domains = [
         Domain(
             domain_name="domain1.com.au",
@@ -68,9 +71,11 @@ def seed_tables():
         )
     ]
 
+    # Add all domains to the session and commit
     db.session.add_all(domains)
     db.session.commit()
 
+    # Create initial services
     services = [
         Service(
             service_name="Domain Manager", 
@@ -109,9 +114,11 @@ def seed_tables():
         )
     ]
 
+    # Add all services to the session and commit
     db.session.add_all(services)
     db.session.commit()
 
+    # Create domain services
     domain_services = [
         Domain_Service(
             domain_id=domains[0].id, 
@@ -133,6 +140,7 @@ def seed_tables():
             )
     ]
 
+    # Add all domain services to the session and commit 
     db.session.add_all(domain_services)
     db.session.commit()
 

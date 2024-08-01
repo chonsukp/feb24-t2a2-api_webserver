@@ -23,7 +23,7 @@ class Domain(db.Model):
     user = db.relationship('User', back_populates='domains')
     domain_services = db.relationship('Domain_Service', back_populates='domain', cascade="all, delete")
 
-    # Constructor to initialize a Domain instance
+    # Constructor to initialise a Domain instance
     def __init__(self, domain_name, registered_period, user_id):
         if not (1 <= registered_period <= 9):
             raise ValueError("Registration period must be between 1 and 9 years")
@@ -34,7 +34,7 @@ class Domain(db.Model):
         self.domain_price = self.calculate_price(registered_period)
         self.user_id = user_id
 
-    # Static method to calculate domain price based on registration period
+    # Calculate domain price based on registration period
     @staticmethod
     def calculate_price(registered_period):
         prices = {
@@ -50,7 +50,7 @@ class Domain(db.Model):
         }
         return prices.get(registered_period, 0)
 
-# Define the schema for serializing and deserializing Domain objects
+# Define the schema for serialising and deserialising Domain objects
 class DomainSchema(ma.Schema):
     # Nested relationships
     user = fields.Nested('UserSchema', only=["id", "name", "email"])
@@ -66,7 +66,7 @@ class DomainSchema(ma.Schema):
     )
 
     class Meta:
-        # Fields to include in the serialized output
+        # Fields to include in the serialised output
         fields = ("id", "domain_name", "registered_period", "registered_date", "expiry_date", "domain_price", "user", "domain_services")
         ordered = True
 

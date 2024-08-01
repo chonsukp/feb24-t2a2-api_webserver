@@ -20,20 +20,20 @@ class Domain_Service(db.Model):
     domain = db.relationship("Domain", back_populates="domain_services")
     service = db.relationship("Service", back_populates="domain_services")
 
-    # Constructor to initialize a Domain_Service instance
+    # Constructor to initialise a Domain_Service instance
     def __init__(self, domain_id, service_id, domain_price, service_price):
         self.domain_id = domain_id
         self.service_id = service_id
         self.total_price = domain_price + service_price
 
-# Define the schema for serializing and deserializing Domain_Service objects
+# Define the schema for serialising and deserialising Domain_Service objects
 class Domain_ServiceSchema(ma.Schema):
     # Nested relationships
     domain = fields.Nested('DomainSchema', only=["domain_name"])
     service = fields.Nested('ServiceSchema', only=["service_name"])
 
     class Meta:
-        # Fields to include in the serialized output
+        # Fields to include in the serialised output
         fields = ("id", "domain_id", "service_id", "total_price", "domain", "service")
         ordered = True
 

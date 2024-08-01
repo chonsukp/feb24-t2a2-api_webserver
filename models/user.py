@@ -22,7 +22,7 @@ class User(db.Model):
     domains = db.relationship('Domain', back_populates='user', cascade="all, delete")
 
 
-# Define the schema for serializing and deserializing User objects
+# Define the schema for serialising and deserialising User objects
 class UserSchema(ma.Schema):
     # Nested relationship to DomainSchema
     domains = fields.List(fields.Nested('DomainSchema', exclude=["user"]))
@@ -43,7 +43,7 @@ class UserSchema(ma.Schema):
     )
 
     class Meta: 
-        # Fields to include in the serialized output
+        # Fields to include in the serialised output
         fields = ("id", "name", "email", "password", "created_date", "is_admin", "domains")
 
 
