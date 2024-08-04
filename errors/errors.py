@@ -3,6 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
 from marshmallow.exceptions import ValidationError
 
+
 # Create a Blueprint for handling errors
 errors_bp = Blueprint('errors', __name__)
 

@@ -6,6 +6,7 @@ from models.domain import Domain
 from models.service import Service
 from models.domain_service import Domain_Service
 
+
 # Create a Blueprint for database commands
 db_commands = Blueprint("db", __name__)
 

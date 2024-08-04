@@ -8,6 +8,7 @@ from models.service import Service
 from models.domain_service import Domain_Service, domain_service_schema
 from utils import auth_as_admin_decorator
 
+
 # Create a Blueprint for the domain services routes
 domain_services_bp = Blueprint("domain_services", __name__, url_prefix="/<int:domain_id>/domain_services")
 

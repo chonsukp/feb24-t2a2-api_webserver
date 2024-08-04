@@ -10,6 +10,7 @@ from models.domain_service import Domain_Service, domain_service_schema, domain_
 from controllers.domain_service_controller import domain_services_bp
 from utils import authorise_as_admin
 
+
 # Create a Blueprint for the domains routes
 domains_bp = Blueprint("domains", __name__, url_prefix="/domains")
 domains_bp.register_blueprint(domain_services_bp)
